@@ -1,0 +1,21 @@
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+}
+
+
+html {
+  -webkit-font-smoothing: antialiased;
+  font: 400 100%/1.6 inherit;
+  box-sizing: border-box;
+}
+
+
+html,
+body,
+.Root {
+  height: 100%;
+}

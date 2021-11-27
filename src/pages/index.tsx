@@ -1,18 +1,18 @@
 import { useCallback, useState } from "react";
 import Head from "next/head";
-import Scale from "../components/Scale";
-import History from "../components/History";
-import ColorBlock from "../components/ColorBlock";
-import checkHex from "../components/checkHex";
-import textColor from "../components/textColor";
-import { useMediaQuery } from "../components/useMediaQuery";
+import { Scale } from "../components/current-color-scale";
+import { History } from "../components/color-history";
+import { ColorBlock } from "../components/color-block";
 
-const App = () => {
+import { useMediaQuery } from "../components/useMediaQuery";
+import { getTextColorFromCurrent, isHexColor } from "../components/utils";
+
+const IndexPage = () => {
   const [color, setColor] = useState("#ffba00");
   const [history, setHistory] = useState<string[]>([]);
 
   const updateStorage = useCallback(() => {
-    if (checkHex(color)) {
+    if (isHexColor(color)) {
       let newColors = [...history, color];
       localStorage.setItem("colors", JSON.stringify(newColors));
 
@@ -45,7 +45,7 @@ const App = () => {
             value={color}
             onChange={(e) => setColor(e.target.value)}
           />
-          {checkHex(color) ? (
+          {isHexColor(color) ? (
             <ColorBlock color={color} />
           ) : (
             <div>
@@ -56,7 +56,7 @@ const App = () => {
             </div>
           )}
         </div>
-        {checkHex(color) && <Scale depth={matches ? 12 : 6} color={color} />}
+        {isHexColor(color) && <Scale depth={matches ? 12 : 6} color={color} />}
       </div>
 
       <style jsx>{`
@@ -73,10 +73,16 @@ const App = () => {
             width: 100%;
             display: block;
             color: ${
-              checkHex(color) ? textColor(color) : "rgba(0, 0, 0, 0.875)"
+              isHexColor(color)
+                ? getTextColorFromCurrent(color)
+                : "rgba(0, 0, 0, 0.875)"
             }
             border-bottom: 2px solid
-              ${checkHex(color) ? textColor(color) : "rgba(0, 0, 0, 0.5)"};
+              ${
+                isHexColor(color)
+                  ? getTextColorFromCurrent(color)
+                  : "rgba(0, 0, 0, 0.5)"
+              };
           }
 
           .flex {
@@ -135,4 +141,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default IndexPage;

@@ -1,6 +1,5 @@
-import React from "react";
 import chroma from "chroma-js";
-import textColor from "./textColor";
+import { getTextColorFromCurrent } from "./utils";
 
 const ScaleBlock = ({ color }: { color: string }) => (
   <div>
@@ -14,13 +13,13 @@ const ScaleBlock = ({ color }: { color: string }) => (
       }
 
       span {
-        color: ${textColor(color)};
+        color: ${getTextColorFromCurrent(color)};
       }
     `}</style>
   </div>
 );
 
-const Scale = ({ color, depth }: { depth: number; color: string }) => (
+export const Scale = ({ color, depth }: { depth: number; color: string }) => (
   <div>
     {chroma
       .scale([chroma(color).brighten(), color, chroma(color).darken(2.6)])
@@ -48,5 +47,3 @@ const Scale = ({ color, depth }: { depth: number; color: string }) => (
     `}</style>
   </div>
 );
-
-export default Scale;

@@ -1,6 +1,4 @@
-import React from "react";
-import textColor from "./textColor";
-import checkHex from "./checkHex";
+import { getTextColorFromCurrent, isHexColor } from "./utils";
 
 const Logo = ({ color, size }: { color: string; size: number }) => (
   <svg fill={color} width={size} height={size} viewBox="0 0 24 24">
@@ -9,7 +7,7 @@ const Logo = ({ color, size }: { color: string; size: number }) => (
   </svg>
 );
 
-const HistoryColor = ({
+export const HistoryColor = ({
   color,
   onClick,
   current,
@@ -25,8 +23,8 @@ const HistoryColor = ({
         cursor: pointer;
         background-color: ${color};
         border: 2px solid;
-        border-color: ${current === color && checkHex(current)
-          ? textColor(color)
+        border-color: ${current === color && isHexColor(current)
+          ? getTextColorFromCurrent(color)
           : "transparent"};
         border-radius: 100%;
         margin: 0 0.5rem 0.25rem 0;
@@ -36,7 +34,7 @@ const HistoryColor = ({
 );
 
 const checkValidHex = (current: string) =>
-  checkHex(current) ? textColor(current) : "#fff";
+  isHexColor(current) ? getTextColorFromCurrent(current) : "#fff";
 
 interface IHistoryProps {
   history: string[];
@@ -45,7 +43,12 @@ interface IHistoryProps {
   clear(): void;
 }
 
-const History = ({ history, onChange, current, clear }: IHistoryProps) => (
+export const History = ({
+  history,
+  onChange,
+  current,
+  clear,
+}: IHistoryProps) => (
   <div className="outer">
     <Logo size={36} color={checkValidHex(current)} />
     <div className="block">
@@ -101,5 +104,3 @@ const History = ({ history, onChange, current, clear }: IHistoryProps) => (
     `}</style>
   </div>
 );
-
-export default History;

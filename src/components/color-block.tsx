@@ -1,7 +1,5 @@
-import React from "react";
 import chroma from "chroma-js";
-import textColor from "./textColor";
-import checkHex from "./checkHex";
+import { isHexColor, getTextColorFromCurrent } from "./utils";
 
 const ColorBlockItem = ({
   hex,
@@ -19,7 +17,7 @@ const ColorBlockItem = ({
       div {
         display: flex;
         align-items: center;
-        color: ${checkHex(hex) ? textColor(hex) : "rgba(0, 0, 0, .875)"};
+        color: ${isHexColor(hex) ? getTextColorFromCurrent(hex) : "rgba(0, 0, 0, .875)"};
       }
 
       .label {
@@ -38,7 +36,7 @@ const ColorBlockItem = ({
   </div>
 );
 
-const ColorBlock = ({ color }: { color: string }) => (
+export const ColorBlock = ({ color }: { color: string }) => (
   <div>
     <ColorBlockItem hex={color} name="Hex" color={color.toUpperCase()} />
     <ColorBlockItem hex={color} name="HSL" color={chroma(color).css("hsl")} />
@@ -50,5 +48,3 @@ const ColorBlock = ({ color }: { color: string }) => (
     `}</style>
   </div>
 );
-
-export default ColorBlock;

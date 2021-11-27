@@ -1,5 +1,6 @@
 import chroma from "chroma-js";
-import { isHexColor, getTextColorFromCurrent } from "./utils";
+import { FiCopy } from "react-icons/fi";
+import { useCopy } from "./useCopy";
 
 const ColorBlockItem = ({
   hex,
@@ -9,42 +10,84 @@ const ColorBlockItem = ({
   hex: string;
   name: string;
   color: string;
-}) => (
-  <div>
-    <span className="label">{name}</span>
-    <span className="color">{color}</span>
-    <style jsx>{`
-      div {
-        display: flex;
-        align-items: center;
-        color: ${isHexColor(hex) ? getTextColorFromCurrent(hex) : "rgba(0, 0, 0, .875)"};
-      }
+}) => {
+  const [, handleCopy] = useCopy();
+  return (
+    <div className="root">
+      <div>
+        <dt>{name}</dt>
+        <dd>{color}</dd>
+      </div>
+      <button onClick={() => handleCopy(color)}>
+        <FiCopy />
+      </button>
 
-      .label {
-        display: inline-block;
-        font-size: 0.75rem;
-        margin-right: 0.5rem;
-        flex: 1;
-      }
+      <style jsx>{`
+        .root {
+          padding: 0 0 0.5rem;
+          display: flex;
+          align-items: center;
+        }
 
-      .color {
-        display: inline-block;
-        font-size: 0.875rem;
-        flex: 4;
-      }
-    `}</style>
-  </div>
-);
+        .root > div {
+          flex: 1;
+        }
+
+        dt {
+          display: block;
+          font-size: 0.75rem;
+          margin-right: 0.25rem;
+        }
+
+        dd {
+          display: block;
+          font-size: 0.875rem;
+          font-family: var(--monospace);
+        }
+
+        button {
+          appearance: none;
+          background: none;
+          border-radius: 0;
+          border: 0;
+          color: inherit;
+        }
+      `}</style>
+    </div>
+  );
+};
 
 export const ColorBlock = ({ color }: { color: string }) => (
-  <div>
-    <ColorBlockItem hex={color} name="Hex" color={color.toUpperCase()} />
-    <ColorBlockItem hex={color} name="HSL" color={chroma(color).css("hsl")} />
-    <ColorBlockItem hex={color} name="RGB" color={chroma(color).css()} />
+  <figure>
+    <object />
+    <figcaption>
+      <dl>
+        <ColorBlockItem hex={color} name="Hex" color={color.toUpperCase()} />
+        <ColorBlockItem
+          hex={color}
+          name="HSL"
+          color={chroma(color).css("hsl")}
+        />
+        <ColorBlockItem hex={color} name="RGB" color={chroma(color).css()} />
+      </dl>
+    </figcaption>
+
     <style jsx>{`
-      div {
-        padding: 1rem 0;
+      figure {
+        border-radius: 0.25rem;
+        overflow: hidden;
+        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 10%), 0 1px 2px 0 rgb(0 0 0 / 6%);
+        margin-bottom: 2rem;
+      }
+
+      object {
+        aspect-ratio: 16 / 9;
+        background: ${color};
+        width: 100%;
+      }
+      dl {
+        padding: 0.5rem;
       }
     `}</style>
-  </div>
+  </figure>
 );

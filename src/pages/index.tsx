@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import Head from "next/head";
 import { Scale } from "../components/current-color-scale";
 import { History } from "../components/color-history";
@@ -6,62 +6,63 @@ import { ColorBlock } from "../components/color-block";
 
 import { useMediaQuery } from "../components/useMediaQuery";
 import { getTextColorFromCurrent, isHexColor } from "../components/utils";
+import { usePersistedHistory } from "../components/usePersistedHistory";
 
 const IndexPage = () => {
   const [color, setColor] = useState("#ffba00");
-  const [history, setHistory] = useState<string[]>([]);
+  const [history, handleClear] = usePersistedHistory(color);
 
-  const updateStorage = useCallback(() => {
-    if (isHexColor(color)) {
-      let newColors = [...history, color];
-      localStorage.setItem("colors", JSON.stringify(newColors));
-
-      setHistory(newColors);
-    }
-  }, [color, history]);
-
-  const handleClear = useCallback(() => {
-    localStorage.clear();
-
-    setHistory([]);
-  }, [setHistory]);
   const matches = useMediaQuery("(min-width: 500px)");
+  const isValidHex = isHexColor(color);
   return (
     <div className="outer">
-      <Head>
-        <title>xpw</title>
-      </Head>
+      <header>
+        <h1>xpw</h1>
+        <Head>
+          <title>xpw</title>
+        </Head>
+      </header>
 
-      <div className="flex">
+      <section>
+        <input
+          type="text"
+          value={color}
+          onChange={(e) => setColor(e.target.value)}
+        />
+
         <History
           clear={handleClear}
           current={color}
           history={history}
           onChange={(c) => setColor(c)}
-        />
-        <div className="inputContainer">
-          <input
-            type="text"
-            value={color}
-            onChange={(e) => setColor(e.target.value)}
-          />
-          {isHexColor(color) ? (
+        >
+          <h3>History</h3>
+        </History>
+
+        {!isValidHex && (
+          <div>
+            <p>
+              Hang On, doesn&apos;t look like {color.toUpperCase()} is a valid
+              hex color, let&apos;s try again.
+            </p>
+          </div>
+        )}
+      </section>
+      <section>
+        {isValidHex && (
+          <>
             <ColorBlock color={color} />
-          ) : (
-            <div>
-              <p>
-                Hang On, doesn't look like {color.toUpperCase()} is a valid hex
-                color, let's try again.
-              </p>
-            </div>
-          )}
-        </div>
-        {isHexColor(color) && <Scale depth={matches ? 12 : 6} color={color} />}
-      </div>
+
+            <h3>Scale</h3>
+            <Scale depth={matches ? 12 : 6} color={color} />
+          </>
+        )}
+      </section>
 
       <style jsx>{`
           input {
             background: none;
+            margin-bottom: 2rem;
             border-top: 0;
             border-left: 0;
             border-right: 0;
@@ -85,35 +86,42 @@ const IndexPage = () => {
               };
           }
 
-          .flex {
-            display: flex;
-          flex-direction: column;
-          justify-content: space-around;
-          background:  ${color};
-          height: 100%;
-          transition: background-color 250ms ease-in-out;
-          padding-top: 7.5rem
-
-          }
-
-          .inputContainer {
-            max-width: 25rem;
-            padding: 1rem;
-            width: 100%;
-          }
-
-
-          @media (min-width: 500px) {
-            .flex {
-              flex-direction: row;
-              justify-content: center;
-              align-items: center;
-              padding-top: 0;
-            }
-          }
-
           .outer {
-            height: 100%;
+            padding: 0 .5rem 2rem;
+            display: grid;
+            gap: 2rem;
+            max-width: 72ch;
+            margin: 2rem auto 0;
+            --columns: 3;
+            grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
+          }
+
+          h1 {
+            font-weight: 700;
+            font-family: var(--monospace);
+            font-size: 1rem;
+          }
+
+          h3 {
+            font-size: 1.125rem;
+            font-weight: 400;
+            opacity: .75;
+            margin: 0 0 .5rem
+          }
+
+          header {
+            grid-column: 1 / -1;
+            padding: .5rem;
+          }
+
+          section {
+            grid-column: span 3 / span 3;
+          }
+
+          @media (min-width: 40rem) {
+            .outer {
+              --columns: 6;
+            }
           }
         `}</style>
       <style jsx global>{`
@@ -125,9 +133,17 @@ const IndexPage = () => {
           box-sizing: inherit;
         }
 
+        :root {
+          --monospace: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
+            Liberation Mono, monospace;
+          --sans-serif: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+            Helvetica, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+            "Segoe UI Symbol";
+        }
+
         html {
           -webkit-font-smoothing: antialiased;
-          font: 400 100% / 1.6 inherit;
+          font: 400 100% / 1.6 var(--sans-serif);
           box-sizing: border-box;
         }
 

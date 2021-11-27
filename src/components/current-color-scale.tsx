@@ -13,6 +13,8 @@ const ScaleBlock = ({ color }: { color: string }) => (
       }
 
       span {
+        font-size: 0.875rem;
+        font-family: var(--monospace);
         color: ${getTextColorFromCurrent(color)};
       }
     `}</style>
@@ -29,7 +31,7 @@ export const Scale = ({ color, depth }: { depth: number; color: string }) => (
       ))}
     <style jsx>{`
       div {
-        --columns: 4;
+        --columns: 2;
         display: grid;
         grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
         width: 100%;
@@ -37,11 +39,7 @@ export const Scale = ({ color, depth }: { depth: number; color: string }) => (
 
       @media (min-width: 500px) {
         div {
-          --columns: 12;
-          position: fixed;
-          left: 0;
-          right: 0;
-          bottom: 0;
+          --columns: 4;
         }
       }
     `}</style>

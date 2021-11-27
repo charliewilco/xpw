@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-export const __IS_BROWSER__: boolean = typeof window !== "undefined";
+ const __IS_BROWSER__: boolean = typeof window !== "undefined";
 
 /**
  * Accepts a media query string then uses the

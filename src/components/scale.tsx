@@ -1,4 +1,3 @@
-import chroma from "chroma-js";
 import { getTextColorFromCurrent } from "./utils";
 
 const ScaleBlock = ({ color }: { color: string }) => (
@@ -21,27 +20,30 @@ const ScaleBlock = ({ color }: { color: string }) => (
   </div>
 );
 
-export const Scale = ({ color, depth }: { depth: number; color: string }) => (
-  <div>
-    {chroma
-      .scale([chroma(color).brighten(), color, chroma(color).darken(2.6)])
-      .colors(depth)
-      .map((color, i) => (
+interface IScaleProps {
+  colors: string[];
+}
+
+export const Scale = ({ colors }: IScaleProps) => {
+  return (
+    <div>
+      {colors.map((color, i) => (
         <ScaleBlock color={color} key={i} />
       ))}
-    <style jsx>{`
-      div {
-        --columns: 2;
-        display: grid;
-        grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
-        width: 100%;
-      }
-
-      @media (min-width: 500px) {
+      <style jsx>{`
         div {
-          --columns: 4;
+          --columns: 2;
+          display: grid;
+          grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
+          width: 100%;
         }
-      }
-    `}</style>
-  </div>
-);
+
+        @media (min-width: 500px) {
+          div {
+            --columns: 4;
+          }
+        }
+      `}</style>
+    </div>
+  );
+};

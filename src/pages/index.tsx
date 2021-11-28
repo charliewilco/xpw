@@ -1,19 +1,75 @@
-import { useState } from "react";
+import { useEffect, useCallback, useMemo, useState } from "react";
 import Head from "next/head";
-import { Scale } from "../components/current-color-scale";
-import { History } from "../components/color-history";
+import chroma from "chroma-js";
+import { Scale } from "../components/scale";
+import { History } from "../components/history";
 import { ColorBlock } from "../components/color-block";
-
-import { useMediaQuery } from "../components/useMediaQuery";
 import { getTextColorFromCurrent, isHexColor } from "../components/utils";
-import { usePersistedHistory } from "../components/usePersistedHistory";
+
+const __IS_BROWSER__: boolean = typeof window !== "undefined";
+const KEY = "XPW_COLORS";
 
 const IndexPage = () => {
   const [color, setColor] = useState("#ffba00");
-  const [history, handleClear] = usePersistedHistory(color);
 
-  const matches = useMediaQuery("(min-width: 500px)");
-  const isValidHex = isHexColor(color);
+  const [history, setHistory] = useState<string[]>([]);
+
+  const updateStorage = useCallback(
+    (color: string) => {
+      if (isHexColor(color)) {
+        setHistory((prev) => {
+          let newColors = Array.from(new Set([...prev, color]));
+          localStorage.setItem(KEY, JSON.stringify(newColors));
+
+          return newColors;
+        });
+      }
+    },
+    [setHistory]
+  );
+
+  useEffect(() => {
+    if (__IS_BROWSER__) {
+      const value = localStorage.getItem(KEY);
+      const parsed = JSON.parse(value);
+
+      if (Array.isArray(parsed)) {
+        setHistory(Array.from(new Set(...parsed)));
+      }
+    }
+  }, [setHistory]);
+
+  useEffect(() => {
+    if (__IS_BROWSER__) {
+      updateStorage(color);
+    }
+  }, [color, updateStorage]);
+
+  const handleClear = useCallback(() => {
+    localStorage.clear();
+
+    setHistory([]);
+  }, [setHistory]);
+
+  const handleChange = useCallback((e) => setColor(e.target.value), [setColor]);
+
+  const isValidHex = useMemo(() => isHexColor(color), [color]);
+
+  const definitions = useMemo(() => {
+    const hsl = chroma(color).css("hsl");
+    const rgb = chroma(color).css();
+    return {
+      hsl,
+      rgb,
+    };
+  }, [color]);
+
+  const scale = useMemo(() => {
+    return chroma
+      .scale([chroma(color).brighten(), color, chroma(color).darken(2.6)])
+      .colors(12);
+  }, [color]);
+
   return (
     <div className="outer">
       <header>
@@ -24,17 +80,13 @@ const IndexPage = () => {
       </header>
 
       <section>
-        <input
-          type="text"
-          value={color}
-          onChange={(e) => setColor(e.target.value)}
-        />
+        <input type="text" value={color} onChange={handleChange} />
 
         <History
           clear={handleClear}
           current={color}
           history={history}
-          onChange={(c) => setColor(c)}
+          onChange={setColor}
         >
           <h3>History</h3>
         </History>
@@ -51,10 +103,9 @@ const IndexPage = () => {
       <section>
         {isValidHex && (
           <>
-            <ColorBlock color={color} />
-
+            <ColorBlock color={color} {...definitions} />
             <h3>Scale</h3>
-            <Scale depth={matches ? 12 : 6} color={color} />
+            <Scale colors={scale} />
           </>
         )}
       </section>
@@ -111,7 +162,7 @@ const IndexPage = () => {
 
           header {
             grid-column: 1 / -1;
-            padding: .5rem;
+            padding: .5rem 0;
           }
 
           section {

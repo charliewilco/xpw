@@ -7,7 +7,7 @@ interface IHistoryColorProps {
   onClick(): void;
 }
 
-export const HistoryColor = (props: IHistoryColorProps) => {
+export const HistoryColor: React.VFC<IHistoryColorProps> = (props) => {
   return (
     <div onClick={props.onClick}>
       <style jsx>{`
@@ -35,32 +35,28 @@ interface IHistoryProps {
   clear(): void;
 }
 
-export const History: React.FC<IHistoryProps> = ({
-  history,
-  onChange,
-  current,
-  clear,
-  children,
-}) => {
+export const History: React.VFC<IHistoryProps> = (props) => {
   return (
     <div className="outer">
-      <header>{children}</header>
+      <header>
+        <h3 className="widget-title">History</h3>
+      </header>
       <div className="block">
         <section className="wrap">
-          {history.length > 0 &&
-            history.map((color, i) => (
+          {props.history.length > 0 &&
+            props.history.map((color, i) => (
               <HistoryColor
                 key={i}
                 color={color}
-                current={current}
-                onClick={() => onChange(color)}
+                current={props.current}
+                onClick={() => props.onChange(color)}
               />
             ))}
         </section>
       </div>
       <footer>
-        <button onClick={() => clear()}>
-          <FiTrash2 />
+        <button onClick={() => props.clear()}>
+          <FiTrash2 size={24} />
         </button>
       </footer>
       <style jsx>{`
@@ -81,6 +77,10 @@ export const History: React.FC<IHistoryProps> = ({
         }
   
         button {
+          appearance: none;
+          background: none;
+          border: 0;
+  
   
         }
   

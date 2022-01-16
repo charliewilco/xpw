@@ -10,7 +10,7 @@ const __IS_BROWSER__: boolean = typeof window !== "undefined";
 const KEY = "XPW_COLORS";
 
 const IndexPage = () => {
-  const [color, setColor] = useState("#ffba00");
+  const [color, setColor] = useState("#147aab");
 
   const [history, setHistory] = useState<string[]>([]);
 
@@ -56,24 +56,51 @@ const IndexPage = () => {
   const isValidHex = useMemo(() => isHexColor(color), [color]);
 
   const definitions = useMemo(() => {
-    const hsl = chroma(color).css("hsl");
-    const rgb = chroma(color).css();
-    return {
-      hsl,
-      rgb,
-    };
+    try {
+      const hsl = chroma(color).css("hsl");
+      const rgb = chroma(color).css();
+
+      return {
+        hsl,
+        rgb,
+      };
+    } catch (error) {
+      console.log(error);
+
+      return {
+        hsl: "...",
+        rgb: "...",
+      };
+    }
   }, [color]);
 
   const scale = useMemo(() => {
-    return chroma
-      .scale([chroma(color).brighten(), color, chroma(color).darken(2.6)])
-      .colors(12);
+    try {
+      return chroma
+        .scale([chroma(color).brighten(), color, chroma(color).darken(2.6)])
+        .colors(12);
+    } catch (error) {
+      return [
+        "#fff",
+        "#fff",
+        "#fff",
+        "#fff",
+        "#fff",
+        "#fff",
+        "#fff",
+        "#fff",
+        "#fff",
+        "#fff",
+        "#fff",
+        "#fff",
+      ];
+    }
   }, [color]);
 
   return (
     <div className="outer">
       <header>
-        <h1>xpw</h1>
+        <h1>🩸 🖼 🎨</h1>
         <Head>
           <title>xpw</title>
         </Head>
@@ -87,9 +114,7 @@ const IndexPage = () => {
           current={color}
           history={history}
           onChange={setColor}
-        >
-          <h3>History</h3>
-        </History>
+        />
 
         {!isValidHex && (
           <div>
@@ -102,11 +127,10 @@ const IndexPage = () => {
       </section>
       <section>
         {isValidHex && (
-          <>
+          <div>
             <ColorBlock color={color} {...definitions} />
-            <h3>Scale</h3>
             <Scale colors={scale} />
-          </>
+          </div>
         )}
       </section>
 
@@ -150,14 +174,7 @@ const IndexPage = () => {
           h1 {
             font-weight: 700;
             font-family: var(--monospace);
-            font-size: 1rem;
-          }
-
-          h3 {
-            font-size: 1.125rem;
-            font-weight: 400;
-            opacity: .75;
-            margin: 0 0 .5rem
+            font-size: 1.875rem;
           }
 
           header {
@@ -202,6 +219,13 @@ const IndexPage = () => {
         body,
         #__next {
           height: 100%;
+        }
+
+        .widget-title {
+          font-size: 1.125rem;
+          font-weight: 400;
+          opacity: 0.75;
+          margin: 0 0 0.5rem;
         }
       `}</style>
     </div>

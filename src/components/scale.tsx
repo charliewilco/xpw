@@ -26,10 +26,13 @@ interface IScaleProps {
 
 export const Scale = ({ colors }: IScaleProps) => {
   return (
-    <div>
-      {colors.map((color, i) => (
-        <ScaleBlock color={color} key={i} />
-      ))}
+    <section>
+      <h3 className="widget-title">Scale</h3>
+      <div>
+        {colors.map((color, i) => (
+          <ScaleBlock color={color} key={i} />
+        ))}
+      </div>
       <style jsx>{`
         div {
           --columns: 2;
@@ -44,6 +47,6 @@ export const Scale = ({ colors }: IScaleProps) => {
           }
         }
       `}</style>
-    </div>
+    </section>
   );
 };
